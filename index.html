@@ -34,6 +34,7 @@ input[type=text]{height:44px;background:#101010;border:1px solid #444;border-rad
 .topPrizeInputs{grid-template-columns:repeat(3,1fr)}
 button{width:100%;height:48px;margin-top:12px;border:0;border-radius:10px;font-weight:900;font-size:15px;cursor:pointer}
 .download{background:#fff;color:#111} .clear{background:#292929;color:#fff}
+.actionRow{display:grid;grid-template-columns:1fr 1fr;gap:9px}.actionRow button{width:100%}
 .preview{width:min(720px,calc(100vw - 430px));display:flex;justify-content:center}
 #poster{display:block;width:100%;height:auto;aspect-ratio:3/4;background:#202020}
 @media(max-width:900px){.app{display:block;padding:12px}.panel{width:100%;margin-bottom:16px}.preview{width:100%}}
@@ -49,7 +50,7 @@ button{width:100%;height:48px;margin-top:12px;border:0;border-radius:10px;font-w
   <label>入围奖 × 10</label><div class="five" id="specialInputs"></div>
   <label>安慰奖 × 10</label><div class="five" id="consolationInputs"></div>
   <button class="clear" id="switchBg">豪龙</button>
-  <button class="download" id="download">下载图片</button>
+  <div class="actionRow"><button class="download" id="download">下载图片</button><button class="download" id="copyImage">复制图片</button></div>
   <button class="clear" id="clear">清空号码</button>
  </div>
  <div class="preview"><canvas id="poster" width="1080" height="1440"></canvas></div>
@@ -190,6 +191,23 @@ document.getElementById('switchBg').onclick=()=>{
 document.getElementById('clear').onclick=()=>{
  values.first=values.second=values.third='';values.special.fill('');values.consolation.fill('');
  document.querySelectorAll('input[type=text]').forEach(x=>x.value='');render();
+};
+
+document.getElementById('copyImage').onclick=async()=>{
+ render();
+ const btn=document.getElementById('copyImage');
+ canvas.toBlob(async(blob)=>{
+   if(!blob){ alert('图片生成失败'); return; }
+   try{
+     if(!navigator.clipboard || !window.ClipboardItem) throw new Error('unsupported');
+     await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);
+     const old=btn.textContent;
+     btn.textContent='已复制';
+     setTimeout(()=>btn.textContent=old,1200);
+   }catch(e){
+     alert('这个浏览器不支持直接复制图片，请使用“下载图片”。');
+   }
+ },'image/png');
 };
 
 document.getElementById('download').onclick=async()=> {
