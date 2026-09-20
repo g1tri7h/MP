@@ -43,15 +43,14 @@ button{width:100%;height:48px;margin-top:12px;border:0;border-radius:10px;font-w
 <div class="app">
  <div class="panel">
   <h2>4D 开奖图片生成器</h2>
-  <div class="tip">固定 1080 × 1440 Canvas。数字字形已直接内置，不调用手机或电脑系统字体；iPhone 下载使用系统分享/保存流程。</div>
   <label>更换背景图（可选，默认使用预设背景）</label><input id="bgUpload" type="file" accept="image/*">
   <label>头奖 / 二奖 / 三奖号码</label>
   <div class="five topPrizeInputs"><input type="text" class="num" data-key="first" maxlength="4" inputmode="numeric" placeholder="0000"><input type="text" class="num" data-key="second" maxlength="4" inputmode="numeric" placeholder="0000"><input type="text" class="num" data-key="third" maxlength="4" inputmode="numeric" placeholder="0000"></div>
   <label>入围奖 × 10</label><div class="five" id="specialInputs"></div>
   <label>安慰奖 × 10</label><div class="five" id="consolationInputs"></div>
-  <button class="clear" id="switchBg">SWITCH BACKGROUND · 1</button>
-  <button class="download" id="download">DOWNLOAD PNG</button>
-  <button class="clear" id="clear">CLEAR NUMBERS</button>
+  <button class="clear" id="switchBg">豪龙</button>
+  <button class="download" id="download">下载图片</button>
+  <button class="clear" id="clear">清空号码</button>
  </div>
  <div class="preview"><canvas id="poster" width="1080" height="1440"></canvas></div>
 </div>
@@ -184,7 +183,7 @@ document.getElementById('switchBg').onclick=()=>{
  next.onload=()=>{
    bg=next;
    render();
-   document.getElementById('switchBg').textContent='SWITCH BACKGROUND · '+currentPreset;
+   document.getElementById('switchBg').textContent=currentPreset===1?'豪龙':'9 Lotto';
  };
  next.src=currentPreset===1?PRESET_1:PRESET_2;
 };
