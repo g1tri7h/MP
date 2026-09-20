@@ -16,6 +16,22 @@ input[type=text]{height:44px;background:#101010;border:1px solid #444;border-rad
 .two{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:9px}
 .five{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}
 .five input{min-width:0;text-align:center;padding:0 3px;height:40px;font-size:14px}
+.num{
+ min-width:0!important;
+ text-align:center!important;
+ padding:0 3px!important;
+ height:40px!important;
+ font-size:14px!important;
+ background:#101010!important;
+ border:1px solid #444!important;
+ border-radius:9px!important;
+ color:#fff!important;
+ font-weight:700!important;
+ -webkit-appearance:none;
+ appearance:none;
+}
+.num::placeholder{color:#777;opacity:1}
+.topPrizeInputs{grid-template-columns:repeat(3,1fr)}
 button{width:100%;height:48px;margin-top:12px;border:0;border-radius:10px;font-weight:900;font-size:15px;cursor:pointer}
 .download{background:#fff;color:#111} .clear{background:#292929;color:#fff}
 .preview{width:min(720px,calc(100vw - 430px));display:flex;justify-content:center}
@@ -30,8 +46,7 @@ button{width:100%;height:48px;margin-top:12px;border:0;border-radius:10px;font-w
   <div class="tip">固定 1080 × 1440 Canvas。数字字形已直接内置，不调用手机或电脑系统字体；iPhone 下载使用系统分享/保存流程。</div>
   <label>更换背景图（可选，默认使用预设背景）</label><input id="bgUpload" type="file" accept="image/*">
   <label>头奖 / 二奖 / 三奖号码</label>
-  <input class="num" data-key="first" maxlength="4" inputmode="numeric" placeholder="0000">
-  <div class="two"><input class="num" data-key="second" maxlength="4" inputmode="numeric" placeholder="0000"><input class="num" data-key="third" maxlength="4" inputmode="numeric" placeholder="0000"></div>
+  <div class="five topPrizeInputs"><input type="text" class="num" data-key="first" maxlength="4" inputmode="numeric" placeholder="0000"><input type="text" class="num" data-key="second" maxlength="4" inputmode="numeric" placeholder="0000"><input type="text" class="num" data-key="third" maxlength="4" inputmode="numeric" placeholder="0000"></div>
   <label>入围奖 × 10</label><div class="five" id="specialInputs"></div>
   <label>安慰奖 × 10</label><div class="five" id="consolationInputs"></div>
   <button class="download" id="download">DOWNLOAD PNG</button>
@@ -55,9 +70,48 @@ function makeInputs(boxId,type){
 }
 makeInputs('specialInputs','special'); makeInputs('consolationInputs','consolation');
 
+
 document.querySelectorAll('.num').forEach(x=>x.addEventListener('input',()=>{
- x.value=x.value.replace(/\D/g,'').slice(0,4);values[x.dataset.key]=x.value;render();
+ x.value=x.value.replace(/\D/g,'').slice(0,4);
+ values[x.dataset.key]=x.value;
+ render();
 }));
+
+
+
+
+// One auto-next rule for every number box.
+// keyup is intentionally used here so the top 3's own input sanitizer
+// finishes first before we check for 4 digits.
+document.addEventListener('keyup', function(e){
+  const current=e.target;
+  if(!current.matches('input[type="text"]')) return;
+  if(current.value.length !== 4) return;
+
+  const inputs=Array.from(document.querySelectorAll('input[type="text"]'));
+  const i=inputs.indexOf(current);
+  if(i !== -1 && i < inputs.length-1){
+    inputs[i+1].focus();
+  }
+}, true);
+
+// Mobile/iPhone fallback for numeric keyboards where keyup can be inconsistent.
+let lastAutoNextEl=null;
+document.addEventListener('input', function(e){
+  const current=e.target;
+  if(!current.matches('input[type="text"]')) return;
+
+  setTimeout(function(){
+    if(current.value.length !== 4 || lastAutoNextEl===current) return;
+    const inputs=Array.from(document.querySelectorAll('input[type="text"]'));
+    const i=inputs.indexOf(current);
+    if(i !== -1 && i < inputs.length-1){
+      lastAutoNextEl=current;
+      inputs[i+1].focus();
+      setTimeout(function(){ lastAutoNextEl=null; }, 120);
+    }
+  }, 20);
+}, false);
 
 function cover(img){
  const W=1080,H=1440,ir=img.width/img.height,cr=W/H;
